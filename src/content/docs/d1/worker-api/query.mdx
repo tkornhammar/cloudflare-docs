@@ -1,0 +1,282 @@
+---
+title: D1 Query SQL Statements
+pcx_content_type: concept
+sidebar:
+  order: 4
+---
+
+import { Type, MetaInfo, Details } from "~/components";
+
+## Description
+
+## Methods
+
+### await stmt.all()
+
+Returns all rows as an array of objects, with each result row represented as an object on the `results` property of the `D1Result` type.
+
+```js
+const { results } = await stmt.all();
+```
+
+#### Parameters
+
+- None.
+
+#### Return values
+
+- <code>Array</code>: <Type text="Array"/>
+  - An array of objects.
+  - Each row represents a row.
+	- Each object is created on the `results` property of the `D1Result` type.
+
+<Details header="Example of return values" open = {false}>
+```js
+const stmt = db.prepare("SELECT name, age FROM users LIMIT 3");
+const { results } = await stmt.all();
+console.log(results);
+```
+
+```js output
+[
+  {
+     name: "John",
+     age: 42,
+  },
+   {
+     name: "Anthony",
+     age: 37,
+  },
+    {
+     name: "Dave",
+     age: 29,
+  },
+ ]
+```
+</Details>
+
+#### Guidance
+
+- When joining tables with identical column names, only the leftmost column will be included in the row object. Use [`stmt.raw()`](#await-stmtraw) to return all rows as an array of arrays.
+- When using TypeScript, you can pass a [type parameter](/d1/build-with-d1/d1-client-api/#typescript-support) to `all()` to return a typed result object.
+
+### await stmt.raw()
+
+Returns results as an array of arrays, with each row represented by an array. The return type is an array of arrays, and does not include query metadata.
+
+Column names are not included in the result set by default. To include column names as the first row of the result array, set `.raw({columnNames: true})`.
+
+```js
+const rows = await stmt.raw();
+```
+
+#### Parameters
+
+- <code>columnNames</code>: <Type text="Boolean"/> <MetaInfo text="Optional"/>
+  - A boolean flag which includes column names as the first row of the result array.
+
+#### Return values
+
+- <code>Array</code>: <Type text="Array"/>
+  - An array of arrays.
+	- Each array represents a row.
+
+<Details header="Example of return values" open = {false}>
+```js
+const stmt = db.prepare("SELECT name, age FROM users LIMIT 3");
+const rows = await stmt.raw();
+console.log(rows);
+```
+```js output
+[
+  [ "John", 42 ],
+  [ "Anthony", 37 ],
+  [ "Dave", 29 ],
+]
+```
+
+With parameter `columnNames: true`:
+```js
+const stmt = db.prepare("SELECT name, age FROM users LIMIT 3");
+const [columns, ...rows] = await stmt.raw({ columnNames: true });
+console.log(columns);
+```
+```js output
+[ "name", age ], // The first result array includes the column names
+```
+</Details>
+
+#### Guidance
+
+- When using TypeScript, you can pass a [type parameter](/d1/build-with-d1/d1-client-api/#typescript-support) to `raw()` to return a typed result array.
+
+### await stmt.first()
+
+Returns the first row of the query result. This does not return metadata like the other methods. Instead, it directly returns the object.
+
+```js
+const values = await stmt.first();
+const total = await stmt.first("columnName");
+```
+
+#### Parameters
+
+- <code>columnName</code>: <Type text="String"/> <MetaInfo text="Optional"/>
+  - Specify a `columnName` to return the value from a specific column in the first row of the query result.
+- None.
+  - Do not pass a parameter to obtain all columns from the first row.
+
+#### Return values
+
+- <code>firstRow</code>: <Type text="Object"/>
+  - An object containing the first row of the query result.
+
+- `null`: <Type text="null"/>
+  - If the query returns no rows.
+
+<Details header ="Example of return values" open = {false}>
+
+Get all the columns from the first row:
+
+```js
+const stmt = db.prepare("SELECT COUNT(*) AS total FROM users");
+const values = await stmt.first();
+console.log(values);
+```
+```js output
+{ total: 50 }
+```
+
+Get a specific column from the first row:
+
+```js
+const stmt = db.prepare("SELECT COUNT(*) AS total FROM users");
+const total = await stmt.first("total");
+console.log(total);
+```
+```js output
+50 // NEED CONFIRMING
+```
+</Details>
+
+#### Guidance
+
+- If the query returns rows but `column` does not exist, then `first()` throws the `D1_ERROR` exception.
+- `stmt.first()` does not alter the SQL query. To improve performance, consider appending `LIMIT 1` to your statement.
+- When using TypeScript, you can pass a [type parameter](/d1/build-with-d1/d1-client-api/#typescript-support) to `first()` to return a typed result object.
+
+### await stmt.run()
+
+Runs the query (or queries) and returns results.
+
+```js
+const { results } = await stmt.run();
+```
+
+#### Parameter
+
+- None.
+
+#### Return value
+
+- <code>results</code>: <Type text="Array"/>
+  - An array of objects, where each object represents a row of the query result.
+  - Each object is created on the `results` property of the `D1Result` type. {/*What does it return when `results` is actually empty?*/}
+
+<Details header="Example of return values" open = {false}>
+```js
+const stmt = await db.prepare("SELECT name, age FROM users LIMIT 3");
+const { results } = await stmt.run();
+console.log(results);
+```
+```js output
+[
+  {
+     name: "John",
+     age: 42,
+  },
+   {
+     name: "Anthony",
+     age: 37,
+  },
+    {
+     name: "Dave",
+     age: 29,
+  },
+ ]
+```
+</Details>
+
+#### Guidance
+
+- `results` is empty for write operations such as UPDATE, DELETE, or INSERT.
+- Run is functionally equivalent to `stmt.all()` and can be treated as an alias.
+- When using TypeScript, you can pass a [type parameter](/d1/build-with-d1/d1-client-api/#typescript-support) to `run()` to return a typed result object.
+
+### await db.dump()
+
+:::caution
+This API only works on databases created during D1's alpha period. Check which version your database uses with `wrangler d1 info <DATABASE_NAME>`.
+:::
+
+Dumps the entire D1 database to an SQLite compatible file inside an ArrayBuffer.
+
+```js
+const dump = await db.dump();
+return new Response(dump, {
+	status: 200,
+	headers: {
+		"Content-Type": "application/octet-stream",
+	},
+});
+```
+
+#### Parameters
+
+- None.
+
+#### Return values
+
+- ???
+
+#### Guidance
+
+- ???
+
+### await db.exec()
+
+Executes one or more queries directly without prepared statements or parameters binding.
+
+```js
+const out = await db.exec();
+```
+
+#### Parameters
+
+- ???
+
+#### Return values
+
+- ???
+
+<Details header="Example of return values" open={false}>
+```js
+const migration = await fetch("/migration.sql");
+const out = await db.exec(migration.text());
+console.log(out);
+```
+```js output
+{
+  count: 80,
+  duration: 76
+}
+```
+</Details>
+
+#### Guidance
+
+- This method can have poorer performance (prepared statements can be reused in some cases) and, more importantly, is less safe.
+- Only use this method for maintenance and one-shot tasks (for example, migration jobs).
+- The input can be one or multiple queries separated by `\n`.
+- If an error occurs, an exception is thrown with the query and error messages, execution stops and further statements are not executed. Refer to [Errors](/d1/build-with-d1/d1-client-api/#errors) to learn more.
+
