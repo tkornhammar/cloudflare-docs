@@ -1,0 +1,31 @@
+---
+title: Prepare query statements
+pcx_content_type: concept
+sidebar:
+  order: 1
+---
+
+import { Type, MetaInfo, Details } from "~/components";
+
+## Description
+
+D1 client API supports both prepared and static statements. The best practice is to use prepared statements (which are precompiled objects used by the database) to run the SQL. Prepared statements lead to faster overall execution and prevent SQL injection attacks.
+
+Below is an example of a prepared statement:
+
+```js
+const stmt = db.prepare("SELECT * FROM users WHERE name = ?1").bind("Joe");
+```
+
+However, if you still choose to use a static statement you can use the following as an example:
+
+```js
+const stmt = db.prepare('SELECT * FROM users WHERE name = "John Doe"');
+```
+
+## Methods
+
+### db.prepare()
+
+### db.batch()
+
