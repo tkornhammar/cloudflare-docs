@@ -1,0 +1,51 @@
+---
+title: D1 database
+pcx_content_type: concept
+sidebar:
+  order: 1
+---
+
+import { Type, MetaInfo, Details } from "~/components";
+
+## Description
+
+You can execute queries on your D1 database through SQL statements.
+
+## Methods
+
+### db.prepare()
+
+D1 API supports both prepared and static statements. The recommended approach is to use prepared statements (which are precompiled objects used by the database) to run the SQL. Prepared statements lead to faster overall execution and prevent SQL injection attacks.
+
+Example of a prepared statement:
+
+```js
+const stmt = db.prepare("SELECT * FROM users WHERE name = ?1").bind(someVariable);
+// someVariable will replace the placeholder '?1' in the query.
+```
+
+Example of a static statement:
+
+```js
+const stmt = db.prepare('SELECT * FROM users WHERE name = "John Doe"');
+// "John Doe" is hard-coded into the query. This is a static statement.
+```
+
+#### Parameters
+
+- <code>sqlQuery</code>: <Type text="String"/> <MetaInfo text="Required"/>
+  - The SQL query you wish to execute on the database.
+
+#### Return values
+
+- <code>queryResult</code>:
+  - The result of the SQL query.
+
+### db.batch()
+
+
+
+#### Parameters
+
+#### Return values
+
