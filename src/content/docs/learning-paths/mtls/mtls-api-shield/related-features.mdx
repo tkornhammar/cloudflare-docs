@@ -49,7 +49,7 @@ Each Enterprise account can upload up to five CAs, though this can be increased.
 
 There are different ways to safely and securely deploy Client Certificates across devices. 
 
-Some of the most used methods are [embedding](https://developers.cloudflare.com/ssl/client-certificates/configure-your-mobile-app-or-iot-device/#step-3--embed-the-client-certificate-in-your-mobile-app) the Client Certificate into an application and allowing user devices to download and install that app, or use mobile device management (MDM) to distribute certificates across devices, or to allow user devices to directly download and install the Client Certificate into a device's Certificate Store.
+Some of the most used methods are [embedding](/ssl/client-certificates/configure-your-mobile-app-or-iot-device/#step-3--embed-the-client-certificate-in-your-mobile-app) the Client Certificate into an application and allowing user devices to download and install that app, or use mobile device management (MDM) to distribute certificates across devices, or to allow user devices to directly download and install the Client Certificate into a device's Certificate Store.
 
 Issuing a certificate is an important step, so if possible, perform thorough client verification.
 
@@ -89,7 +89,7 @@ For example, if you're using mTLS and you're restricting requests to certain fol
 
 ## Chain of Trust
 
-Customers creating Client Certificates and selecting the the option to "_use my private key and CSR_", providing a CSR, which was provided by your end-customers, in order to generate the Client Certificates and share it with your end-customers. However, if your end-customers request the Certificate Chain, this can potentially be shared by the Cloudflare account team. 
+Customers creating Client Certificates and selecting the option to "_use my private key and CSR_", providing a CSR, which was provided by your end-customers, in order to generate the Client Certificates and share it with your end-customers. However, if your end-customers request the Certificate Chain, this can potentially be shared by the Cloudflare account team.
 
 Contact your account team for more information.
 
@@ -125,7 +125,7 @@ By enabling [forwarding a certificate](/ssl/client-certificates/enable-mtls/#clo
 - `Cf-Client-Cert-Der-Base64` (raw certificate in DER format, encoded as base64)
 - `Cf-Client-Cert-Sha256` (SHA256 fingerprint of the certificate)
 
-The header `Cf-Client-Cert-Sha256` can be used within the [Rate Limiting characteristics](/waf/rate-limiting-rules/parameters/#with-the-same-characteristics) “Header value of”.
+The header `Cf-Client-Cert-Sha256` can be used within the [Rate Limiting characteristics](/waf/rate-limiting-rules/parameters/#with-the-same-characteristics) "Header value of".
 
 Example [Rate Limiting Rule](/waf/rate-limiting-rules/):
 
