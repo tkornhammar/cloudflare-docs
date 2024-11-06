@@ -21,14 +21,16 @@ Example of a prepared statement:
 
 ```js
 const stmt = db.prepare("SELECT * FROM users WHERE name = ?1").bind(someVariable);
-// someVariable will replace the placeholder '?1' in the query.
+// A variable (someVariable) will replace the placeholder '?1' in the query.
+// This is a prepared statement.
 ```
 
 Example of a static statement:
 
 ```js
 const stmt = db.prepare('SELECT * FROM users WHERE name = "John Doe"');
-// "John Doe" is hard-coded into the query. This is a static statement.
+// "John Doe" is hard-coded into the query.
+// This is a static statement.
 ```
 
 #### Parameters
@@ -48,6 +50,32 @@ const stmt = db.prepare('SELECT * FROM users WHERE name = "John Doe"');
   - You can only pass parameters to the last query.
 	```js
 	const stmt = db.prepare(`SELECT * FROM users WHERE name = "Anthony"; SELECT * FROM users WHERE name = ?1`).bind("Joe")
+	```
+- D1 follows the [SQLite convention](https://www.sqlite.org/lang_expr.html#varparam) for prepared statements parameter binding. Currently, D1 only supports Ordered (`?NNNN`) and Anonymous (`?`) parameters. In the future, D1 will support named parameters as well.
+
+	| Syntax | Type      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+	| ------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+	| `?NNN` | Ordered   | A question mark followed by a number `NNN` holds a spot for the `NNN`-th parameter. `NNN` must be between `1` and `SQLITE_MAX_VARIABLE_NUMBER`                                                                                                                                                                                                                                                                                                                                                                                                    |
+	| `?`    | Anonymous | A question mark that is not followed by a number creates a parameter with a number one greater than the largest parameter number already assigned. If this means the parameter number is greater than SQLITE_MAX_VARIABLE_NUMBER, it is an error. This parameter format is provided for compatibility with other database engines. But because it is easy to miscount the question marks, the use of this parameter format is discouraged. Programmers are encouraged to use one of the symbolic formats below or the `?NNN` format above instead |
+
+	To bind a parameter, use the `stmt.bind()` method.
+
+	Order and anonymous examples:
+
+	```js
+	const stmt = db.prepare("SELECT * FROM users WHERE name = ?").bind("John Doe");
+	```
+
+	```js
+	const stmt = db
+		.prepare("SELECT * FROM users WHERE name = ? AND age = ?")
+		.bind("John Doe", 41);
+	```
+
+	```js
+	const stmt = db
+		.prepare("SELECT * FROM users WHERE name = ?2 AND age = ?1")
+		.bind(41, "John Doe");
 	```
 
 ### `db.batch()`
@@ -123,7 +151,7 @@ console.log(rows[1].results);
 
 ### `db.exec()`
 
-Executes one or more queries directly without prepared statements or parameters binding. This method can have poorer performance (prepared statements can be reused in some cases) and, more importantly, is less safe. Only use this method for maintenance and one-shot tasks (for example, migration jobs). The input can be one or multiple queries separated by `\n`.
+Executes one or more queries directly without prepared statements or parameters binding.
 
 ```js
 const migration = await fetch("/migration.sql");
@@ -156,6 +184,9 @@ console.log(out);
 #### Guidance
 
 - If an error occurs, an exception is thrown with the query and error messages, execution stops and further statements are not executed. Refer to [Errors](/d1/build-with-d1/d1-client-api/#errors) to learn more.
+- This method can have poorer performance (prepared statements can be reused in some cases) and, more importantly, is less safe.
+- Only use this method for maintenance and one-shot tasks (for example, migration jobs).
+- The input can be one or multiple queries separated by `\n`.
 
 ### `db.dump`
 

@@ -1,5 +1,5 @@
 ---
-title: D1 Query
+title: D1 query
 pcx_content_type: concept
 sidebar:
   order: 2
@@ -13,32 +13,30 @@ You can modify the query results which has been obtained after executing a `.db(
 
 ## Methods
 
-### await stmt.all()
+### `await stmt.run()`
 
-Returns all rows as an array of objects, with each result row represented as an object on the `results` property of the `D1Result` type.
+Runs the query (or queries) and returns results.
 
 ```js
-const { results } = await stmt.all();
+const { results } = await stmt.run();
 ```
 
-#### Parameters
+#### Parameter
 
 - None.
 
-#### Return values
+#### Return value
 
-- <code>Array</code>: <Type text="Array"/>
-  - An array of objects.
-  - Each row represents a row.
-	- Each object is created on the `results` property of the `D1Result` type.
+- <code>results</code>: <Type text="Array"/>
+  - An array of objects, where each object represents a row of the query result.
+  - Each object is created on the `results` property of the `D1Result` type. {/*What does it return when `results` is actually empty?*/}
 
 <Details header="Example of return values" open = {false}>
 ```js
-const stmt = db.prepare("SELECT name, age FROM users LIMIT 3");
-const { results } = await stmt.all();
+const stmt = await db.prepare("SELECT name, age FROM users LIMIT 3");
+const { results } = await stmt.run();
 console.log(results);
 ```
-
 ```js output
 [
   {
@@ -59,10 +57,12 @@ console.log(results);
 
 #### Guidance
 
-- When joining tables with identical column names, only the leftmost column will be included in the row object. Use [`stmt.raw()`](#await-stmtraw) to return all rows as an array of arrays.
-- When using TypeScript, you can pass a [type parameter](/d1/build-with-d1/d1-client-api/#typescript-support) to `all()` to return a typed result object.
+- `results` is empty for write operations such as UPDATE, DELETE, or INSERT.
+- When using TypeScript, you can pass a [type parameter](/d1/build-with-d1/d1-client-api/#typescript-support) to `run()` to return a typed result object.
+- `stmt.run()` is functionally equivalent to `stmt.all()` and can be treated as an alias.
+-
 
-### await stmt.raw()
+### `await stmt.raw()`
 
 Returns results as an array of arrays, with each row represented by an array. The return type is an array of arrays, and does not include query metadata.
 
@@ -112,7 +112,7 @@ console.log(columns);
 
 - When using TypeScript, you can pass a [type parameter](/d1/build-with-d1/d1-client-api/#typescript-support) to `raw()` to return a typed result array.
 
-### await stmt.first()
+### `await stmt.first()`
 
 Returns the first row of the query result. This does not return metadata like the other methods. Instead, it directly returns the object.
 
@@ -167,30 +167,32 @@ console.log(total);
 - `stmt.first()` does not alter the SQL query. To improve performance, consider appending `LIMIT 1` to your statement.
 - When using TypeScript, you can pass a [type parameter](/d1/build-with-d1/d1-client-api/#typescript-support) to `first()` to return a typed result object.
 
-### await stmt.run()
+{/* ### `stmt.all()`
 
-Runs the query (or queries) and returns results.
+Returns all rows as an array of objects, with each result row represented as an object on the `results` property of the `D1Result` type.
 
 ```js
-const { results } = await stmt.run();
+const { results } = await stmt.all();
 ```
 
-#### Parameter
+#### Parameters
 
 - None.
 
-#### Return value
+#### Return values
 
-- <code>results</code>: <Type text="Array"/>
-  - An array of objects, where each object represents a row of the query result.
-  - Each object is created on the `results` property of the `D1Result` type. {/*What does it return when `results` is actually empty?*/}
+- <code>Array</code>: <Type text="Array"/>
+  - An array of objects.
+  - Each row represents a row.
+	- Each object is created on the `results` property of the `D1Result` type.
 
 <Details header="Example of return values" open = {false}>
 ```js
-const stmt = await db.prepare("SELECT name, age FROM users LIMIT 3");
-const { results } = await stmt.run();
+const stmt = db.prepare("SELECT name, age FROM users LIMIT 3");
+const { results } = await stmt.all();
 console.log(results);
 ```
+
 ```js output
 [
   {
@@ -211,74 +213,5 @@ console.log(results);
 
 #### Guidance
 
-- `results` is empty for write operations such as UPDATE, DELETE, or INSERT.
-- Run is functionally equivalent to `stmt.all()` and can be treated as an alias.
-- When using TypeScript, you can pass a [type parameter](/d1/build-with-d1/d1-client-api/#typescript-support) to `run()` to return a typed result object.
-
-### await db.dump()
-
-:::caution
-This API only works on databases created during D1's alpha period. Check which version your database uses with `wrangler d1 info <DATABASE_NAME>`.
-:::
-
-Dumps the entire D1 database to an SQLite compatible file inside an ArrayBuffer.
-
-```js
-const dump = await db.dump();
-return new Response(dump, {
-	status: 200,
-	headers: {
-		"Content-Type": "application/octet-stream",
-	},
-});
-```
-
-#### Parameters
-
-- None.
-
-#### Return values
-
-- ???
-
-#### Guidance
-
-- ???
-
-### await db.exec()
-
-Executes one or more queries directly without prepared statements or parameters binding.
-
-```js
-const out = await db.exec();
-```
-
-#### Parameters
-
-- ???
-
-#### Return values
-
-- ???
-
-<Details header="Example of return values" open={false}>
-```js
-const migration = await fetch("/migration.sql");
-const out = await db.exec(migration.text());
-console.log(out);
-```
-```js output
-{
-  count: 80,
-  duration: 76
-}
-```
-</Details>
-
-#### Guidance
-
-- This method can have poorer performance (prepared statements can be reused in some cases) and, more importantly, is less safe.
-- Only use this method for maintenance and one-shot tasks (for example, migration jobs).
-- The input can be one or multiple queries separated by `\n`.
-- If an error occurs, an exception is thrown with the query and error messages, execution stops and further statements are not executed. Refer to [Errors](/d1/build-with-d1/d1-client-api/#errors) to learn more.
-
+- When joining tables with identical column names, only the leftmost column will be included in the row object. Use [`stmt.raw()`](#await-stmtraw) to return all rows as an array of arrays.
+- When using TypeScript, you can pass a [type parameter](/d1/build-with-d1/d1-client-api/#typescript-support) to `all()` to return a typed result object. */}
