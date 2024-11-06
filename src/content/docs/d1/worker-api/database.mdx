@@ -13,7 +13,7 @@ You can execute queries on your D1 database through SQL statements.
 
 ## Methods
 
-### db.prepare()
+### `db.prepare()`
 
 D1 API supports both prepared and static statements. The recommended approach is to use prepared statements (which are precompiled objects used by the database) to run the SQL. Prepared statements lead to faster overall execution and prevent SQL injection attacks.
 
@@ -41,11 +41,145 @@ const stmt = db.prepare('SELECT * FROM users WHERE name = "John Doe"');
 - <code>queryResult</code>:
   - The result of the SQL query.
 
-### db.batch()
+#### Guidance
 
+- You can pass multiple queries into a single `.prepare()` statement. Simply delineate each query with a semi-colon.
+  - The statement only returns the results of the last query, even though all queries are executed.
+  - You can only pass parameters to the last query.
+	```js
+	const stmt = db.prepare(`SELECT * FROM users WHERE name = "Anthony"; SELECT * FROM users WHERE name = ?1`).bind("Joe")
+	```
 
+### `db.batch()`
+
+Batching sends multiple SQL statements inside a single call to the database. This can have a huge performance impact as it reduces latency from network round trips to D1. D1 operates in auto-commit. Our implementation guarantees that each statement in the list will execute and commit, sequentially, non-concurrently.
+
+Batched statements are [SQL transactions](https://www.sqlite.org/lang_transaction.html). If a statement in the sequence fails, then an error is returned for that specific statement, and it aborts or rolls back the entire sequence.
+
+To send batch statements, provide `.batch()` a list of prepared statements and get the results in the same order.
+
+```js
+await db.batch([
+  db.prepare("UPDATE users SET name = ?1 WHERE id = ?2").bind("John", 17),
+  db.prepare("UPDATE users SET age = ?1 WHERE id = ?2").bind(35, 19),
+]);
+```
 
 #### Parameters
 
+- <code>statementArray</code>: <Type text="Array"/>
+  - An array of `db.prepare()` statements.
+
 #### Return values
+
+- <code>resultArray</code>: <Type text="Array"/>
+  - An array of results of the `.db.prepare()` statements. Each result is contained in the array position corresponding to the array position of the `db.prepare()` statement within the `statementArray`.
+
+<Details header="Example of return values" open={false}>
+
+```js
+const rows = await db.batch([
+	db.prepare("SELECT * FROM users WHERE name = ?1").bind("John"),
+	db.prepare("SELECT * FROM users WHERE name = ?1").bind("Anthony")
+	]);
+```
+```js
+console.log(rows[0].results);
+```
+```js output
+[
+  {
+     name: "John Clemente",
+     age: 42,
+  },
+   {
+     name: "John Davis",
+     age: 37,
+  },
+ ]
+```
+```js
+console.log(rows[1].results);
+```
+```js output
+[
+  {
+     name: "Anthony Hopkins",
+     age: 66,
+  },
+ ]
+```
+</Details>
+
+#### Guidance
+
+- You can construct batches reusing the same prepared statement:
+
+	```js
+	const stmt = db.prepare("SELECT * FROM users WHERE name = ?1");
+
+	const rows = await db.batch([stmt.bind("John"), stmt.bind("Anthony")]);
+	```
+
+### `db.exec()`
+
+Executes one or more queries directly without prepared statements or parameters binding. This method can have poorer performance (prepared statements can be reused in some cases) and, more importantly, is less safe. Only use this method for maintenance and one-shot tasks (for example, migration jobs). The input can be one or multiple queries separated by `\n`.
+
+```js
+const migration = await fetch("/migration.sql");
+const out = await db.exec(migration.text());
+```
+
+#### Parameters
+
+-
+
+#### Return values
+
+- <code>queryResult</code>: <Type text="Any"/>
+  - Result of the query.
+
+<Details header="Example of return values" open={false}>
+```js
+const migration = await fetch("/migration.sql");
+const out = await db.exec(migration.text());
+console.log(out);
+```
+```js output
+{
+  count: 80,
+  duration: 76
+}
+```
+</Details>
+
+#### Guidance
+
+- If an error occurs, an exception is thrown with the query and error messages, execution stops and further statements are not executed. Refer to [Errors](/d1/build-with-d1/d1-client-api/#errors) to learn more.
+
+### `db.dump`
+
+:::caution
+This API only works on databases created during D1's alpha period. Check which version your database uses with `wrangler d1 info <DATABASE_NAME>`.
+:::
+
+Dumps the entire D1 database to an SQLite compatible file inside an ArrayBuffer.
+
+```js
+const dump = await db.dump();
+return new Response(dump, {
+	status: 200,
+	headers: {
+		"Content-Type": "application/octet-stream",
+	},
+});
+```
+
+#### Parameters
+
+-
+
+#### Return values
+
+-
 
