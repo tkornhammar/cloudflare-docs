@@ -13,7 +13,7 @@ You can modify the query results which has been obtained after executing a `.db(
 
 ## Methods
 
-### `await stmt.run()`
+### `stmt.run()`
 
 Runs the query (or queries) and returns results.
 
@@ -29,7 +29,7 @@ const { results } = await stmt.run();
 
 - <code>results</code>: <Type text="Array"/>
   - An array of objects, where each object represents a row of the query result.
-  - Each object is created on the `results` property of the `D1Result` type. {/*What does it return when `results` is actually empty?*/}
+  - For more information on the returned object, refer to [Return objects](/d1/worker-api/return-object).
 
 <Details header="Example of return values" open = {false}>
 ```js
@@ -62,7 +62,7 @@ console.log(results);
 - `stmt.run()` is functionally equivalent to `stmt.all()` and can be treated as an alias.
 -
 
-### `await stmt.raw()`
+### `stmt.raw()`
 
 Returns results as an array of arrays, with each row represented by an array. The return type is an array of arrays, and does not include query metadata.
 
@@ -112,7 +112,7 @@ console.log(columns);
 
 - When using TypeScript, you can pass a [type parameter](/d1/build-with-d1/d1-client-api/#typescript-support) to `raw()` to return a typed result array.
 
-### `await stmt.first()`
+### `stmt.first()`
 
 Returns the first row of the query result. This does not return metadata like the other methods. Instead, it directly returns the object.
 

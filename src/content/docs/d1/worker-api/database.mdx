@@ -95,13 +95,14 @@ await db.batch([
 
 #### Parameters
 
-- <code>statementArray</code>: <Type text="Array"/>
+- <code>statements</code>: <Type text="Array"/>
   - An array of `db.prepare()` statements.
 
 #### Return values
 
-- <code>resultArray</code>: <Type text="Array"/>
-  - An array of results of the `.db.prepare()` statements. Each result is contained in the array position corresponding to the array position of the `db.prepare()` statement within the `statementArray`.
+- <code>results</code>: <Type text="Array"/>
+  - An array of objects containing the results of the `.db.prepare()` statements. Each object is in the array position corresponding to the array position of the initial `db.prepare()` statement within the `statementArray`.
+  - For more information on the returned object, refer to [Return objects](/d1/worker-api/return-object).
 
 <Details header="Example of return values" open={false}>
 

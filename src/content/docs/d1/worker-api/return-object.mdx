@@ -1,0 +1,42 @@
+---
+title: Return object
+pcx_content_type: concept
+sidebar:
+  order: 3
+---
+
+The methods `stmt.run()` and `db.batch()` return a typed `D1Result` object that contains the results (if applicable), the success status, and a meta object with the internal duration of the operation in milliseconds.
+
+```js
+{
+  results: array | null, // [] if empty, or null if it does not apply
+  success: boolean, // true if the operation was successful, false otherwise
+  meta: {
+    duration: number, // duration of the operation in milliseconds
+    rows_read: number, // the number of rows read (scanned) by this query
+    rows_written: number // the number of rows written by this query
+  }
+}
+```
+
+## Example:
+
+```js
+const { duration } = (
+	await db
+		.prepare("INSERT INTO users (name, age) VALUES (?1, ?2)")
+		.bind("John", 42)
+		.run()
+).meta;
+
+console.log(duration); // 0.172
+```
+
+The `db.exec()` method returns a `D1ExecResult` object:
+
+```js
+{
+  count: number, // the number of queries executed
+  duration: number // duration of the operation in milliseconds
+}
+```
