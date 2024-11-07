@@ -44,12 +44,14 @@ D1 API supports both prepared and static statements.
 
 The recommended approach is to use prepared statements (which are precompiled objects used by the database) to run the SQL. Prepared statements lead to faster overall execution and prevent SQL injection attacks.
 
-Example of a prepared statement:
+Example of a prepared statement with dynamically bound value:
 
 ```js
+// Dynamically generate the value to use.
+const someVariable = "John Doe";
 const stmt = db.prepare("SELECT * FROM users WHERE name = ?1").bind(someVariable);
 // A variable (someVariable) will replace the placeholder '?1' in the query.
-// This is a prepared statement.
+// `stmt` is a prepared statement.
 ```
 
 Example of a static statement:
@@ -57,7 +59,7 @@ Example of a static statement:
 ```js
 const stmt = db.prepare('SELECT * FROM users WHERE name = "John Doe"');
 // "John Doe" is hard-coded into the query.
-// This is a static statement.
+// `stmt` will also be a prepared statement.
 ```
 
 #### Parameters
@@ -74,7 +76,7 @@ const stmt = db.prepare('SELECT * FROM users WHERE name = "John Doe"');
 
 - You can pass multiple queries into a single `.prepare()` statement. Simply delineate each query with a semi-colon.
   - The statement only returns the results of the last query, even though all queries are executed.
-  - You can only pass parameters to the last query.
+  - You can only bind parameters to the last query.
 	```js
 	const stmt = db.prepare(`SELECT * FROM users WHERE name = "Anthony"; SELECT * FROM users WHERE name = ?1`).bind("Joe")
 	```
@@ -137,7 +139,7 @@ await db.batch([
 const rows = await db.batch([
 	db.prepare("SELECT * FROM users WHERE name = ?1").bind("John"),
 	db.prepare("SELECT * FROM users WHERE name = ?1").bind("Anthony")
-	]);
+]);
 ```
 ```js
 console.log(rows[0].results);
@@ -163,7 +165,7 @@ console.log(rows[1].results);
      name: "Anthony Hopkins",
      age: 66,
   },
- ]
+]
 ```
 </Details>
 
