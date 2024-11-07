@@ -11,11 +11,38 @@ import { Type, MetaInfo, Details } from "~/components";
 
 You can execute queries on your D1 database through SQL statements.
 
+### TypeScript support
+
+D1 Worker Bindings API is fully-typed via the `@cloudflare/workers-types` package, and also supports [generic types](https://www.typescriptlang.org/docs/handbook/2/generics.html#generic-types) as part of its TypeScript API. A generic type allows you to provide an optional _type parameter_ so that a function understands the type of the data it is handling.
+
+When using the [query statement methods](#query-statement-methods) `stmt.all()`, `stmt.raw()` and `stmt.first()`, you can provide a type representing each database row. D1's API will [return the result object](#return-object) with the correct type.
+
+For example, providing an `OrderRow` type as a type parameter to `stmt.all()` will return a typed `Array<OrderRow>` object instead of the default `Record<string, unknown>` type:
+
+```ts
+// Row definition
+type OrderRow = {
+	Id: string;
+	CustomerName: string;
+	OrderDate: number;
+};
+
+// Elsewhere in your application
+const result = await env.MY_DB.prepare(
+	"SELECT Id, CustomerName, OrderDate FROM [Order] ORDER BY ShippedDate DESC LIMIT 100",
+).all<OrderRow>();
+```
+
 ## Methods
 
 ### `db.prepare()`
 
-D1 API supports both prepared and static statements. The recommended approach is to use prepared statements (which are precompiled objects used by the database) to run the SQL. Prepared statements lead to faster overall execution and prevent SQL injection attacks.
+D1 API supports both prepared and static statements.
+
+- Prepared statements are SQL statements where the variables are dynamically determined. When writing a prepared statement, you insert variables into placeholders within the statement string.
+- Static statements are SQL statements where the variables have been hard coded. When writing a static statement, you manually type the variable within the statement string.
+
+The recommended approach is to use prepared statements (which are precompiled objects used by the database) to run the SQL. Prepared statements lead to faster overall execution and prevent SQL injection attacks.
 
 Example of a prepared statement:
 

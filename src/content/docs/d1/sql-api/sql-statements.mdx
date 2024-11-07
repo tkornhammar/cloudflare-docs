@@ -18,9 +18,9 @@ D1 supports a subset of SQLite extensions for added functionality, including:
 - Default SQLite extensions.
 - [FTS5 module](https://www.sqlite.org/fts5.html) for full-text search.
 
-## PRAGMA statements
+## Compatible PRAGMA statements
 
-D1 supports [SQLite PRAGMA](https://www.sqlite.org/pragma.html) statements. The PRAGMA statement is an SQL extension for SQLite. PRAGMA commands can be used to:
+D1 supports some [SQLite PRAGMA](https://www.sqlite.org/pragma.html) statements. The PRAGMA statement is an SQL extension for SQLite. PRAGMA commands can be used to:
 
 - Modify the behavior of certain SQLite operations.
 - Query the SQLite library for internal data about schemas or tables (but note that PRAGMA statements cannot query the contents of a table).
@@ -53,6 +53,22 @@ SELECT name, sql FROM sqlite_master
         "name": "Product",
         "sql": "CREATE TABLE \"Product\" ( \"Id\" INTEGER PRIMARY KEY, \"ProductName\" VARCHAR(8000) NULL, \"SupplierId\" INTEGER NOT NULL, \"CategoryId\" INTEGER NOT NULL, \"QuantityPerUnit\" VARCHAR(8000) NULL, \"UnitPrice\" DECIMAL NOT NULL, \"UnitsInStock\" INTEGER NOT NULL, \"UnitsOnOrder\" INTEGER NOT NULL, \"ReorderLevel\" INTEGER NOT NULL, \"Discontinued\" INTEGER NOT NULL)"
       }
+```
+
+## Search with LIKE
+
+You can perform a search using SQL's `LIKE` operator:
+
+```js
+const { results } = await env.DB.prepare(
+	"SELECT * FROM Customers WHERE CompanyName LIKE ?",
+)
+	.bind("%eve%")
+	.all();
+console.log("results: ", results);
+```
+```js output
+results:  [...]
 ```
 
 ## Related resources

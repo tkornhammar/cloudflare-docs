@@ -5,7 +5,11 @@ sidebar:
   order: 3
 ---
 
-The methods `stmt.run()` and `db.batch()` return a typed `D1Result` object that contains the results (if applicable), the success status, and a meta object with the internal duration of the operation in milliseconds.
+The methods `stmt.run()` and `db.batch()` return a typed `D1Result` object for each query statement. This object contains:
+
+- The results (if applicable) as an array
+- The success status
+- A meta object with the internal duration of the operation in milliseconds
 
 ```js
 {
