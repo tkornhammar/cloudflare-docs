@@ -1,5 +1,5 @@
 ---
-title: D1 database
+title: Prepare a statement
 pcx_content_type: concept
 sidebar:
   order: 1
@@ -7,11 +7,13 @@ sidebar:
 
 import { Type, MetaInfo, Details } from "~/components";
 
-## Description
+You can execute queries on your D1 database through SQL query statements. To do this, you need to follow these steps:
 
-You can execute queries on your D1 database through SQL statements.
+1. Prepare your query statement.
+2. If appliable, bind variables into your statement.
+3. Execute your query.
 
-### TypeScript support
+## TypeScript support
 
 D1 Worker Bindings API is fully-typed via the `@cloudflare/workers-types` package, and also supports [generic types](https://www.typescriptlang.org/docs/handbook/2/generics.html#generic-types) as part of its TypeScript API. A generic type allows you to provide an optional _type parameter_ so that a function understands the type of the data it is handling.
 
@@ -37,12 +39,14 @@ const result = await env.MY_DB.prepare(
 
 ### `db.prepare()`
 
-D1 API supports both prepared and static statements.
+Prepares a query statement statement. D1 API supports both prepared and static statements.
 
 - Prepared statements are SQL statements where the variables are dynamically determined. When writing a prepared statement, you insert variables into placeholders within the statement string.
 - Static statements are SQL statements where the variables have been hard coded. When writing a static statement, you manually type the variable within the statement string.
 
+:::note
 The recommended approach is to use prepared statements (which are precompiled objects used by the database) to run the SQL. Prepared statements lead to faster overall execution and prevent SQL injection attacks.
+:::
 
 Example of a prepared statement with dynamically bound value:
 

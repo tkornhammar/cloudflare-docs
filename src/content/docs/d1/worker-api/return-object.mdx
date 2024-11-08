@@ -7,40 +7,59 @@ sidebar:
 
 The methods `stmt.run()` and `db.batch()` return a typed `D1Result` object for each query statement. This object contains:
 
-- The results (if applicable) as an array
 - The success status
 - A meta object with the internal duration of the operation in milliseconds
+- The results (if applicable) as an array
 
 ```js
 {
-  results: array | null, // [] if empty, or null if it does not apply
   success: boolean, // true if the operation was successful, false otherwise
   meta: {
-    duration: number, // duration of the operation in milliseconds
+    served_by: string // the version of Cloudflare's backend Worker that returned the result
+    duration: number, // the duration of the SQL query execution only, in milliseconds
+		changes: number, // the number of changes made to the database
+		last_row_id: number, // the last inserted row ID, only applies when the table is defined without the `WITHOUT ROWID` option
+		changed_db: boolean, // true if something on the database was changed
+    size_after: number, // the size of the database after the query is successfully applied
     rows_read: number, // the number of rows read (scanned) by this query
     rows_written: number // the number of rows written by this query
   }
+  results: array | null, // [] if empty, or null if it does not apply
 }
 ```
 
 ## Example:
 
 ```js
-const { duration } = (
-	await db
-		.prepare("INSERT INTO users (name, age) VALUES (?1, ?2)")
-		.bind("John", 42)
-		.run()
-).meta;
-
-console.log(duration); // 0.172
+const someVariable = `Bs Beverages`;
+const stmt = env.DB.prepare("SELECT * FROM Customers WHERE CompanyName = ?").bind(someVariable);
+const returnValue = await stmt.run();
+return Response.json(result)
 ```
-
-The `db.exec()` method returns a `D1ExecResult` object:
-
 ```js
 {
-  count: number, // the number of queries executed
-  duration: number // duration of the operation in milliseconds
+  "success": true,
+  "meta": {
+    "served_by": "miniflare.db",
+    "duration": 1,
+    "changes": 0,
+    "last_row_id": 0,
+    "changed_db": false,
+    "size_after": 8192,
+    "rows_read": 4,
+    "rows_written": 0
+  },
+  "results": [
+    {
+      "CustomerId": 11,
+      "CompanyName": "Bs Beverages",
+      "ContactName": "Victoria Ashworth"
+    },
+    {
+      "CustomerId": 13,
+      "CompanyName": "Bs Beverages",
+      "ContactName": "Random Name"
+    }
+  ]
 }
 ```
