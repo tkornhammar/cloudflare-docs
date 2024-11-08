@@ -7,13 +7,11 @@ head: []
 description: Add security by requiring a valid authorization token for each request.
 ---
 
-The Authenticated Gateway feature in AI Gateway adds security by requiring a valid authorization token for each request. This feature is especially useful when storing logs persistently, as it prevents unauthorized access and protects against "log bombing." With Authenticated Gateway enabled, only requests with the correct token are processed.
+Using an Authenticated Gateway in AI Gateway adds security by requiring a valid authorization token for each request. This feature is especially useful when storing logs, as it prevents unauthorized access and protects against "log bombing." With Authenticated Gateway enabled, only requests with the correct token are processed.
 
 :::note
 We recommend enabling Authenticated Gateway when opting to store logs with AI Gateway.
-:::
 
-:::caution[Caution]
 If Authenticated Gateway is enabled but a request does not include the required `cf-aig-authorization` header, the request will fail. This setting ensures that only verified requests pass through the gateway. To bypass the need for the `cf-aig-authorization` header, make sure to disable Authenticated Gateway.
 :::
 
