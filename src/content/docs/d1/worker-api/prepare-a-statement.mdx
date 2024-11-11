@@ -9,17 +9,18 @@ import { Type, MetaInfo, Details } from "~/components";
 
 You can execute queries on your D1 database through SQL query statements. To do this, you need to follow these steps:
 
-1. Prepare your query statement.
-2. If appliable, bind variables into your statement.
-3. Execute your query.
+1. Prepare your query statement (including binding variables into the statement).
+2. Execute your query.
+
+This chapter documents how to prepare a statement and how to execute them.
 
 ## TypeScript support
 
 D1 Worker Bindings API is fully-typed via the `@cloudflare/workers-types` package, and also supports [generic types](https://www.typescriptlang.org/docs/handbook/2/generics.html#generic-types) as part of its TypeScript API. A generic type allows you to provide an optional _type parameter_ so that a function understands the type of the data it is handling.
 
-When using the [query statement methods](#query-statement-methods) `stmt.all()`, `stmt.raw()` and `stmt.first()`, you can provide a type representing each database row. D1's API will [return the result object](#return-object) with the correct type.
+When using the [query statement methods](#query-statement-methods) `stmt.run()`, `stmt.raw()` and `stmt.first()`, you can provide a type representing each database row. D1's API will [return the result object](#return-object) with the correct type.
 
-For example, providing an `OrderRow` type as a type parameter to `stmt.all()` will return a typed `Array<OrderRow>` object instead of the default `Record<string, unknown>` type:
+For example, providing an `OrderRow` type as a type parameter to `stmt.run()` will return a typed `Array<OrderRow>` object instead of the default `Record<string, unknown>` type:
 
 ```ts
 // Row definition
@@ -32,14 +33,16 @@ type OrderRow = {
 // Elsewhere in your application
 const result = await env.MY_DB.prepare(
 	"SELECT Id, CustomerName, OrderDate FROM [Order] ORDER BY ShippedDate DESC LIMIT 100",
-).all<OrderRow>();
+).run<OrderRow>();
 ```
 
 ## Methods
 
 ### `db.prepare()`
 
-Prepares a query statement statement. D1 API supports both prepared and static statements.
+Prepares a query statement to be later executed.
+
+D1 API supports both prepared and static statements.
 
 - Prepared statements are SQL statements where the variables are dynamically determined. When writing a prepared statement, you insert variables into placeholders within the statement string.
 - Static statements are SQL statements where the variables have been hard coded. When writing a static statement, you manually type the variable within the statement string.
@@ -51,19 +54,18 @@ The recommended approach is to use prepared statements (which are precompiled ob
 Example of a prepared statement with dynamically bound value:
 
 ```js
-// Dynamically generate the value to use.
-const someVariable = "John Doe";
-const stmt = db.prepare("SELECT * FROM users WHERE name = ?1").bind(someVariable);
-// A variable (someVariable) will replace the placeholder '?1' in the query.
+const someVariable = `Bs Beverages`;
+const stmt = env.DB.prepare("SELECT * FROM Customers WHERE CompanyName = ?").bind(someVariable);
+// A variable (someVariable) will replace the placeholder '?' in the query.
 // `stmt` is a prepared statement.
 ```
 
 Example of a static statement:
 
 ```js
-const stmt = db.prepare('SELECT * FROM users WHERE name = "John Doe"');
-// "John Doe" is hard-coded into the query.
-// `stmt` will also be a prepared statement.
+const stmt = env.DB.prepare("SELECT * FROM Customers WHERE CompanyName = Bs Beverages");
+// "Bs Beverages" is hard-coded into the query.
+// `stmt` is a static statement.
 ```
 
 #### Parameters
@@ -73,8 +75,7 @@ const stmt = db.prepare('SELECT * FROM users WHERE name = "John Doe"');
 
 #### Return values
 
-- <code>queryResult</code>:
-  - The result of the SQL query.
+- None.
 
 #### Guidance
 
@@ -96,33 +97,36 @@ const stmt = db.prepare('SELECT * FROM users WHERE name = "John Doe"');
 	Order and anonymous examples:
 
 	```js
-	const stmt = db.prepare("SELECT * FROM users WHERE name = ?").bind("John Doe");
+	const stmt = db.prepare("SELECT * FROM Customers WHERE CompanyName = ?").bind("");
 	```
 
 	```js
 	const stmt = db
-		.prepare("SELECT * FROM users WHERE name = ? AND age = ?")
-		.bind("John Doe", 41);
+		.prepare("SELECT * FROM Customers WHERE CompanyName = ? AND CustomerId = ?")
+		.bind("Alfreds Futterkiste", 1);
 	```
 
 	```js
 	const stmt = db
-		.prepare("SELECT * FROM users WHERE name = ?2 AND age = ?1")
-		.bind(41, "John Doe");
+		.prepare("SELECT * FROM Customers WHERE CompanyName = ?2 AND CustomerId = ?1")
+		.bind(1, "Alfreds Futterkiste");
 	```
 
 ### `db.batch()`
 
-Batching sends multiple SQL statements inside a single call to the database. This can have a huge performance impact as it reduces latency from network round trips to D1. D1 operates in auto-commit. Our implementation guarantees that each statement in the list will execute and commit, sequentially, non-concurrently.
+Sends multiple SQL statements inside a single call to the database. This can have a huge performance impact as it reduces latency from network round trips to D1. D1 operates in auto-commit. Our implementation guarantees that each statement in the list will execute and commit, sequentially, non-concurrently.
 
 Batched statements are [SQL transactions](https://www.sqlite.org/lang_transaction.html). If a statement in the sequence fails, then an error is returned for that specific statement, and it aborts or rolls back the entire sequence.
 
 To send batch statements, provide `.batch()` a list of prepared statements and get the results in the same order.
 
 ```js
-await db.batch([
-  db.prepare("UPDATE users SET name = ?1 WHERE id = ?2").bind("John", 17),
-  db.prepare("UPDATE users SET age = ?1 WHERE id = ?2").bind(35, 19),
+const companyName1 = `Bs Beverages`;
+const companyName2 = `Around the Horn`;
+const stmt = env.DB.prepare(`SELECT * FROM Customers WHERE CompanyName = ?`);
+const batchResult = await env.DB.batch([
+	stmt.bind(companyName1),
+	stmt.bind(companyName2)
 ]);
 ```
 
@@ -140,35 +144,73 @@ await db.batch([
 <Details header="Example of return values" open={false}>
 
 ```js
-const rows = await db.batch([
-	db.prepare("SELECT * FROM users WHERE name = ?1").bind("John"),
-	db.prepare("SELECT * FROM users WHERE name = ?1").bind("Anthony")
+const companyName1 = `Bs Beverages`;
+const companyName2 = `Around the Horn`;
+const stmt = await env.DB.batch([
+	env.DB.prepare(`SELECT * FROM Customers WHERE CompanyName = ?`).bind(companyName1),
+	env.DB.prepare(`SELECT * FROM Customers WHERE CompanyName = ?`).bind(companyName2)
 ]);
-```
-```js
-console.log(rows[0].results);
+return Response.json(stmt)
 ```
 ```js output
 [
   {
-     name: "John Clemente",
-     age: 42,
+    "success": true,
+    "meta": {
+      "served_by": "miniflare.db",
+      "duration": 0,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 8192,
+      "rows_read": 4,
+      "rows_written": 0
+    },
+    "results": [
+      {
+        "CustomerId": 11,
+        "CompanyName": "Bs Beverages",
+        "ContactName": "Victoria Ashworth"
+      },
+      {
+        "CustomerId": 13,
+        "CompanyName": "Bs Beverages",
+        "ContactName": "Random Name"
+      }
+    ]
   },
-   {
-     name: "John Davis",
-     age: 37,
-  },
- ]
+  {
+    "success": true,
+    "meta": {
+      "served_by": "miniflare.db",
+      "duration": 0,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 8192,
+      "rows_read": 4,
+      "rows_written": 0
+    },
+    "results": [
+      {
+        "CustomerId": 4,
+        "CompanyName": "Around the Horn",
+        "ContactName": "Thomas Hardy"
+      }
+    ]
+  }
+]
 ```
 ```js
-console.log(rows[1].results);
+console.log(stmt[1].results);
 ```
 ```js output
 [
   {
-     name: "Anthony Hopkins",
-     age: 66,
-  },
+    "CustomerId": 4,
+    "CompanyName": "Around the Horn",
+    "ContactName": "Thomas Hardy"
+  }
 ]
 ```
 </Details>
@@ -178,9 +220,14 @@ console.log(rows[1].results);
 - You can construct batches reusing the same prepared statement:
 
 	```js
-	const stmt = db.prepare("SELECT * FROM users WHERE name = ?1");
-
-	const rows = await db.batch([stmt.bind("John"), stmt.bind("Anthony")]);
+		const companyName1 = `Bs Beverages`;
+		const companyName2 = `Around the Horn`;
+		const stmt = env.DB.prepare(`SELECT * FROM Customers WHERE CompanyName = ?`);
+		const batchResult = await env.DB.batch([
+			stmt.bind(companyName1),
+			stmt.bind(companyName2)
+		]);
+		return Response.json(batchResult);
 	```
 
 ### `db.exec()`
