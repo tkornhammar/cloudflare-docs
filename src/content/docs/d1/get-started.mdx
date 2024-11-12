@@ -13,6 +13,7 @@ import {
 	FileTree,
 	Tabs,
 	TabItem,
+	TypeScriptExample
 } from "~/components";
 
 This guide instructs you through:
@@ -298,6 +299,7 @@ After you have set up your database, run an SQL query from within your Worker.
 2. Clear the content of `index.ts`.
 3. Paste the following code snippet into your `index.ts` file:
 
+    <TypeScriptExample filename="index.ts">
     ```typescript
     export interface Env {
     	// If you set another name in wrangler.toml as the value for 'binding',
@@ -325,6 +327,7 @@ After you have set up your database, run an SQL query from within your Worker.
     	},
     } satisfies ExportedHandler<Env>;
     ```
+    </TypeScriptExample>
 
     In the code above, you:
 
@@ -403,10 +406,6 @@ To deploy your Worker to production using Wrangler, you must first repeat the [d
 
    ```sh
    npx wrangler deploy
-   ```
-
-   ```sh output
-   Outputs: https://d1-tutorial.<YOUR_SUBDOMAIN>.workers.dev
    ```
 
    ```sh output
@@ -533,5 +532,4 @@ If you have any feature requests or notice any bugs, share your feedback directl
 
 - See supported [Wrangler commands for D1](/workers/wrangler/commands/#d1).
 - Learn how to use the [D1 client API](/d1/build-with-d1/d1-client-api/) within your Worker.
-- Learn the basics of using Workers with D1 and CLI development in a guided learning experience with [Cloudflare CLI tutor](/workers/get-started/cf-tutor/).
 - Explore [community projects built on D1](/d1/reference/community-projects/).
