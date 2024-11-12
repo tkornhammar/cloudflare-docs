@@ -7,11 +7,6 @@ sidebar:
 
 import { Type, MetaInfo, Details } from "~/components";
 
-You can execute queries on your D1 database through SQL query statements. To do this, you need to follow these steps:
-
-1. Prepare your query statement (including binding variables into the statement).
-2. Execute your query.
-
 This chapter documents how to prepare a statement.
 
 ## Methods
@@ -20,30 +15,9 @@ This chapter documents how to prepare a statement.
 
 Prepares a query statement to be later executed.
 
-D1 API supports both prepared and static statements.
-
-- Prepared statements are SQL statements where the variables are dynamically determined. When writing a prepared statement, you insert variables into placeholders within the statement string.
-- Static statements are SQL statements where the variables have been hard coded. When writing a static statement, you manually type the variable within the statement string.
-
-:::note
-The recommended approach is to use prepared statements (which are precompiled objects used by the database) to run the SQL. Prepared statements lead to faster overall execution and prevent SQL injection attacks.
-:::
-
-Example of a prepared statement with dynamically bound value:
-
 ```js
 const someVariable = `Bs Beverages`;
 const stmt = env.DB.prepare("SELECT * FROM Customers WHERE CompanyName = ?").bind(someVariable);
-// A variable (someVariable) will replace the placeholder '?' in the query.
-// `stmt` is a prepared statement.
-```
-
-Example of a static statement:
-
-```js
-const stmt = env.DB.prepare("SELECT * FROM Customers WHERE CompanyName = Bs Beverages");
-// "Bs Beverages" is hard-coded into the query.
-// `stmt` is a static statement.
 ```
 
 #### Parameters
@@ -90,22 +64,27 @@ const stmt = env.DB.prepare("SELECT * FROM Customers WHERE CompanyName = Bs Beve
 		.bind(1, "Alfreds Futterkiste");
 	```
 
-- D1 Worker Bindings API is fully-typed via the `@cloudflare/workers-types` package, and also supports [generic types](https://www.typescriptlang.org/docs/handbook/2/generics.html#generic-types) as part of its TypeScript API. A generic type allows you to provide an optional _type parameter_ so that a function understands the type of the data it is handling.
+## Static statements
 
-  - When using the [query statement methods](#query-statement-methods) `stmt.run()`, `stmt.raw()` and `stmt.first()`, you can provide a type representing each database row. D1's API will [return the result object](#return-object) with the correct type.
+D1 API supports static statements. Static statements are SQL statements where the variables have been hard coded. When writing a static statement, you manually type the variable within the statement string.
 
-  - For example, providing an `OrderRow` type as a type parameter to `stmt.run()` will return a typed `Array<OrderRow>` object instead of the default `Record<string, unknown>` type:
+:::note
+The recommended approach is to bind parameters to create a prepared statement (which are precompiled objects used by the database) to run the SQL. Prepared statements lead to faster overall execution and prevent SQL injection attacks.
+:::
 
-	```ts
-	// Row definition
-	type OrderRow = {
-	Id: string;
-	CustomerName: string;
-	OrderDate: number;
-	};
+Example of a prepared statement with dynamically bound value:
 
-	// Elsewhere in your application
-	const result = await env.MY_DB.prepare(
-	"SELECT Id, CustomerName, OrderDate FROM [Order] ORDER BY ShippedDate DESC LIMIT 100",
-	).run<OrderRow>();
-	```
+```js
+const someVariable = `Bs Beverages`;
+const stmt = env.DB.prepare("SELECT * FROM Customers WHERE CompanyName = ?").bind(someVariable);
+// A variable (someVariable) will replace the placeholder '?' in the query.
+// `stmt` is a prepared statement.
+```
+
+Example of a static statement:
+
+```js
+const stmt = env.DB.prepare("SELECT * FROM Customers WHERE CompanyName = Bs Beverages");
+// "Bs Beverages" is hard-coded into the query.
+// `stmt` is a static statement.
+```
