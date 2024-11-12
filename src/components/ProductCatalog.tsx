@@ -103,7 +103,7 @@ const ProductCatalog = ({
 						>
 							<div className="flex items-center">
 								{product.icon && (
-									<div className="rounded-full p-2 bg-orange-50 mr-2 text-orange-500">
+									<div className="rounded-full p-2 bg-orange-50 mr-2 text-orange-500 dark:bg-orange-950">
 										<svg
 											{...product.icon.attributes}
 											width={28}
@@ -113,7 +113,7 @@ const ProductCatalog = ({
 									</div>
 								)}
 								{!product.icon && (
-									<div className="flex items-center justify-center leading-none rounded-full p-2 bg-orange-50 mr-2 text-[color:var(--orange-accent-200)] text-xl font-bold w-11 h-11">
+									<div className="flex items-center justify-center leading-none rounded-full p-2 bg-orange-50 dark:bg-orange-950 mr-2 text-[color:var(--orange-accent-200)] text-xl font-bold w-11 h-11">
 										{product.data.name.substr(0, 1)}
 									</div>
 								)}
