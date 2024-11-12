@@ -18,21 +18,32 @@ import { AstroIcon } from "~/components";
 		<form>
 			<fieldset>
 				<div>
-					<input type="radio" id="accurate" name="reason" />
+					<input type="radio" id="accurate" value="accurate" name="reason" />
 					<label for="accurate">Accurate</label>
 				</div>
 				<div>
-					<input type="radio" id="easy-to-understand" name="reason" />
+					<input
+						type="radio"
+						id="easy-to-understand"
+						value="easy-to-understand"
+						name="reason"
+					/>
 					<label for="easy-to-understand">Easy to understand</label>
 				</div>
 				<div>
-					<input type="radio" id="solved-my-problem" name="reason" />
+					<input
+						type="radio"
+						id="solved-my-problem"
+						value="solved-my-problem"
+						name="reason"
+					/>
 					<label for="solved-my-problem">Solved my problem</label>
 				</div>
 				<div>
 					<input
 						type="radio"
 						id="helped-me-decide-to-use-the-product"
+						value="solved-my-problem"
 						name="reason"
 					/>
 					<label for="helped-me-decide-to-use-the-product"
@@ -67,15 +78,25 @@ import { AstroIcon } from "~/components";
 					<label for="hard-to-understand">Hard to understand</label>
 				</div>
 				<div>
-					<input type="radio" id="incorrect-information" name="reason" />
+					<input
+						type="radio"
+						id="incorrect-information"
+						value="incorrect-information"
+						name="reason"
+					/>
 					<label for="incorrect-information">Incorrect information</label>
 				</div>
 				<div>
-					<input type="radio" id="missing-the-information" name="reason" />
+					<input
+						type="radio"
+						id="missing-the-information"
+						value="missing-the-information"
+						name="reason"
+					/>
 					<label for="missing-the-information">Missing the information</label>
 				</div>
 				<div>
-					<input type="radio" id="other" name="reason" />
+					<input type="radio" id="other" value="other" name="reason" />
 					<label for="other">Other</label>
 					<input
 						type="text"
