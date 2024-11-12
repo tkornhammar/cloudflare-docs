@@ -7,9 +7,11 @@ sidebar:
   label: Oblivious DoH
 ---
 
-As announced on [our blog](https://blog.cloudflare.com/oblivious-dns/), since late 2020, Cloudflare 1.1.1.1 supports Oblivious DNS over HTTPS (ODoH) ([RFC 9230](https://www.rfc-editor.org/rfc/rfc9230.html)).
+As announced on [our blog](https://blog.cloudflare.com/oblivious-dns/), since late 2020, Cloudflare 1.1.1.1 supports Oblivious DNS over HTTPS (ODoH).
 
-ODoH is a protocol for performing remote Domain Name System (DNS) resolution based on the Oblivious HTTP protocol (OHTTP) ([RFC 9458](https://www.rfc-editor.org/rfc/rfc9458.html)).
+:::caution
+Although ODoH is defined in [RFC 9230](https://www.rfc-editor.org/rfc/rfc9230.html), it is experimental. 1.1.1.1 supports ODoH as [described bellow](#cloudflare-and-third-party-products), but this protocol is not endorsed by IETF nor by Cloudflare.
+:::
 
 ## How ODoH works
 
@@ -31,7 +33,7 @@ Cloudflare 1.1.1.1 supports ODoH by acting as a target that can be reached at `o
 
 At launch, a few proxy partners included [PCCW](https://www.pccw.com/), [SURF](https://www.surf.nl/), and [Equinix](https://www.equinix.com/).
 
-Finally, open source test clients are available in [Rust](https://github.com/cloudflare/odoh-client-rs) or [Go](https://github.com/cloudflare/odoh-client-go).
+Finally, open source test clients are available in [Rust](https://github.com/DNSCrypt/dnscrypt-resolvers/blob/master/v3/odoh-relays.md) or [Go](https://github.com/cloudflare/odoh-client-go).
 
 ## Related resources
 
