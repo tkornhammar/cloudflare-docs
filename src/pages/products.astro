@@ -1,7 +1,9 @@
 ---
-import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
-
+// @ts-ignore virtual module
+import iconCollection from "virtual:astro-icon";
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { getIconData, iconToSVG } from "@iconify/utils";
 import ProductCatalog from "~/components/ProductCatalog";
 
 let products: CollectionEntry<"products">[] = await getCollection(
@@ -11,13 +13,22 @@ let products: CollectionEntry<"products">[] = await getCollection(
 	},
 );
 
-products = products.map((product) => ({
-	...product,
-	groups: [
-		product.data.product.group,
-		...(product.data.product.additional_groups || []),
-	].filter((val) => Boolean(val)),
-}));
+products = products.map((product) => {
+	const iconData = getIconData(iconCollection.local, product.id);
+	let icon = null;
+	if (iconData) {
+		icon = iconToSVG(iconData);
+	}
+
+	return {
+		...product,
+		icon,
+		groups: [
+			product.data.product.group,
+			...(product.data.product.additional_groups || []),
+		].filter((val) => Boolean(val)),
+	};
+});
 
 const frontmatter = {
 	title: "Products",

@@ -1,13 +1,14 @@
 import { useState, type ChangeEvent } from "react";
-import { getIconData, iconToSVG } from "@iconify/utils";
-// @ts-ignore virtual module
-import iconCollection from "virtual:astro-icon";
-import { type CollectionEntry } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import type { IconifyIconBuildResult } from "@iconify/utils";
 
 const ProductCatalog = ({
 	products,
 }: {
-	products: CollectionEntry<"products">[];
+	products: (CollectionEntry<"products"> & {
+		icon: IconifyIconBuildResult;
+		groups: string[];
+	})[];
 }) => {
 	const [filters, setFilters] = useState<{
 		search: string;
@@ -94,29 +95,24 @@ const ProductCatalog = ({
 						</p>
 					</div>
 				)}
-				{productList.map((product, idx) => {
-					const iconData = getIconData(iconCollection.local, product.id);
-					let icon = null;
-					if (iconData) {
-						icon = iconToSVG(iconData);
-					}
+				{productList.map((product) => {
 					return (
 						<a
 							href={product.data.product.url}
 							className="self-stretch p-3 border-gray-200 dark:border-gray-700 border-solid border rounded-md block !text-inherit no-underline hover:bg-gray-50 dark:hover:bg-black"
 						>
 							<div className="flex items-center">
-								{icon && (
+								{product.icon && (
 									<div className="rounded-full p-2 bg-orange-50 mr-2 text-orange-500">
 										<svg
-											{...icon.attributes}
+											{...product.icon.attributes}
 											width={28}
 											height={28}
-											dangerouslySetInnerHTML={{ __html: icon.body }}
+											dangerouslySetInnerHTML={{ __html: product.icon.body }}
 										/>
 									</div>
 								)}
-								{!icon && (
+								{!product.icon && (
 									<div className="flex items-center justify-center leading-none rounded-full p-2 bg-orange-50 mr-2 text-[color:var(--orange-accent-200)] text-xl font-bold w-11 h-11">
 										{product.data.name.substr(0, 1)}
 									</div>
