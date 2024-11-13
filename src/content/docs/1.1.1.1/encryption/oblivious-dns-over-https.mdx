@@ -10,22 +10,22 @@ sidebar:
 As announced on [our blog](https://blog.cloudflare.com/oblivious-dns/), since late 2020, Cloudflare 1.1.1.1 supports Oblivious DNS over HTTPS (ODoH).
 
 :::caution
-Although ODoH is defined in [RFC 9230](https://www.rfc-editor.org/rfc/rfc9230.html), it is experimental. 1.1.1.1 supports ODoH as [described bellow](#cloudflare-and-third-party-products), but this protocol is not endorsed by IETF nor by Cloudflare.
+ODoH is defined in [RFC 9230](https://www.rfc-editor.org/rfc/rfc9230.html). This RFC is experimental and is not endorsed by the IETF.
 :::
 
 ## How ODoH works
 
-OHTTP improves privacy by separating the contents of an HTTP request (and response) from its requester IP address. To achieve this in DNS resolution, a proxy and a target are introduced between the client and the upstream DNS resolver:
-
-- The target only has access to the encrypted query and the proxy's IP address.
+ODoH improves privacy by separating the contents of an HTTP request (and response) from its requester IP address. To achieve this, a proxy and a target are introduced between the client and the upstream DNS resolver:
 
 - The proxy has no visibility into the DNS messages, with no ability to identify, read, or modify either the query being sent by the client or the answer being returned by the target.
+
+- The target only has access to the encrypted query and the proxy's IP address, while not having visibility over the client's IP address.
 
 - Only the intended target can read the content of the query and produce a response, which is also encrypted.
 
 This means that, as long as the proxy and the target do not collude, no single entity can have access to both the DNS messages and the client IP address at the same time. Also, clients are in complete control of proxy and target selection.
 
-Additionally, clients encrypt their query for the target using Hybrid Public Key Encryption. A target's public key is obtained via DNS, where it is bundled into a HTTPS resource record and protected by DNSSEC.
+Additionally, clients encrypt their query for the target using Hybrid Public Key Encryption. A target's public key is obtained via DNS, where it is bundled into an HTTPS resource record and protected by DNSSEC.
 
 ## Cloudflare and third-party products
 
@@ -33,7 +33,7 @@ Cloudflare 1.1.1.1 supports ODoH by acting as a target that can be reached at `o
 
 At launch, a few proxy partners included [PCCW](https://www.pccw.com/), [SURF](https://www.surf.nl/), and [Equinix](https://www.equinix.com/).
 
-Finally, open source test clients are available in [Rust](https://github.com/DNSCrypt/dnscrypt-resolvers/blob/master/v3/odoh-relays.md) or [Go](https://github.com/cloudflare/odoh-client-go).
+Finally, open source clients such as [dnscrypt-proxy](https://github.com/DNSCrypt/dnscrypt-proxy) can be used to make ODoH queries.
 
 ## Related resources
 
