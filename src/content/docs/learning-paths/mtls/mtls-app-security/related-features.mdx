@@ -66,12 +66,12 @@ The recommended TLS versions for mTLS are:
 Using outdated versions like TLS 1.0 or 1.1 is not recommended due to known vulnerabilities.
 
 :::note
-For modern mTLS implementations, Elliptic Curve Cryptography (EC) is recommended because it offers faster handshakes and better performance, uses smaller key sizes result in reduced computational overhead while maintaining strong security, and EC is more scalable for large-scale deployments, such as in cloud-native applications, microservices, and mobile networks. RSA is only recommended if you have legacy systems that cannot support EC or if you require compatibility with systems that only work with RSA.
+For modern mTLS implementations, Elliptic Curve Cryptography (EC) and [modern Cipher Suites](/ssl/edge-certificates/additional-options/cipher-suites/supported-cipher-suites/) are recommended because it offers faster handshakes and better performance, uses smaller key sizes result in reduced computational overhead while maintaining strong security, and EC is more scalable for large-scale deployments, such as in cloud-native applications, microservices, and mobile networks. RSA is only recommended if you have legacy systems that cannot support EC or if you require compatibility with systems that only work with RSA.
 :::
 
 ## TLS Session Resumption
 
-Browsers connecting to a domain with a [wildcard](/dns/manage-dns-records/reference/wildcard-dns-records/) [Edge Certificate](ssl/edge-certificates/) in place, connecting to the same domain's mTLS subdomain could cause a non-authentication event, due to TLS Session Resumption.
+Browsers connecting to a domain with a [wildcard](/dns/manage-dns-records/reference/wildcard-dns-records/) [Edge Certificate](ssl/edge-certificates/) in place, connecting to the same domain's mTLS subdomain could cause a non-authentication event, due to TLS Session Resumption, or also called [Connection Resumption](/speed/optimization/protocol/0-rtt-connection-resumption/).
 
 It is generally not recommended to use wildcard certificates.
 
@@ -83,7 +83,7 @@ Review the [troubleshooting documentation](/ssl/client-certificates/troubleshoot
 Resumption and renegotiation are essentially opposites. Resumption re-establishes a previous TLS session over a new TCP connection, keeping the same TLS parameters. In contrast, renegotiation updates certain TLS parameters within an existing session, continuing over the same TCP connection.
 :::
 
-If you need to use Client Certificates after the TLS handshake via renegotiation, you'll need to use a prior version. This is because TLS 1.3 doesn't support renegotiation.
+If you need to use Client Certificates after the TLS handshake via renegotiation, you'll need to use a prior TLS version than 1.3. This is because TLS 1.3 doesn't support renegotiation.
 
 For example, if you're using mTLS and you're restricting requests to certain folders, based on a URL path in the request, rather than all content on your origin server, a TLS renegotiation may be triggered. Connections using TLS 1.3 don't support renegotiation.
 
@@ -96,7 +96,7 @@ Contact your account team for more information.
 ## WAF for Client Certificates
 
 :::note
-[Revoked](/api-shield/security/mtls/configure/#check-for-revoked-certificates) Client Certificates are not automatically blocked unless you have an active WAF Custom Rule specifically checking for and blocking them. This check only applies to Client Certificates issued by the Cloudflare-managed CA. Cloudflare currently does not check certificate revocation lists (CRL) for CAs that have been uploaded by the customer ([BYO CA](/ssl/client-certificates/byo-ca/)). One can opt for Workers to manage a custom business logic and block revoked Client Certificates. See the [Workers section](placeholder) for more information.
+[Revoked](/api-shield/security/mtls/configure/#check-for-revoked-certificates) Client Certificates are not automatically blocked unless you have an active WAF Custom Rule specifically checking for and blocking them. This check only applies to Client Certificates issued by the Cloudflare-managed CA. Cloudflare currently does not check certificate revocation lists (CRL) for CAs that have been uploaded by the customer ([BYO CA](/ssl/client-certificates/byo-ca/)). One can opt for Workers to manage a custom business logic and block revoked Client Certificates. See the [Workers section](/learning-paths/mtls/mtls-workers/) for more information.
 :::
 
 In order to effectively implement mTLS with Cloudflare, it is strongly recommended to properly configure the [Cloudflare WAF](/waf/). Review the available []`cf.tls_*`](/ruleset-engine/rules-language/fields/dynamic-fields/#cftls_cipher) dynamic fields.
@@ -119,6 +119,14 @@ Another example WAF Custom Rule with action block, using the [cf.tls_client_auth
 (http.request.uri.path in {"/headers"} and http.host in {"mtls.example.com" "mtls2.example.com"} and not cf.tls_client_auth.cert_verified and cf.tls_client_auth.cert_fingerprint_sha256 ne "ADD_STRING_OF_CLIENT_CERT_SHA256_FINGERPRINT")
 ```
 
+Here's another example of a WAF custome rule to associate a serial number with a hostname: 
+
+```txt
+(http.host in {"mtls.example.com" "mtls2.example.com"} and cf.tls_client_auth.cert_serial ne "ADD_STRING_OF_CLIENT_CERT_SERIAL")
+```
+
+This expression will check for a specific [Client Certificate serial number](/ruleset-engine/rules-language/fields/dynamic-fields/#cftls_client_authcert_serial) linked to specific hostnames, allowing for more granular control. 
+
 ## Rate Limiting by Client Certificates
 
 By enabling [forwarding a certificate](/ssl/client-certificates/enable-mtls/#cloudflare-api) via the Cloudflare API, the first request of an mTLS connection will include the following headers:
@@ -140,8 +148,12 @@ With the same characteristics...
 
 ## Cloudflare API Shield
 
-In addition to mTLS, customers can purchase [API Shield](/api-shield/) features, such as API Discovery, API Routing, Volumetric Abuse Detection, Sequence Mitigation, JWT Validation, and Schema Validation.
+In addition to mTLS, customers can purchase [API Shield](/api-shield/) features, such as API Discovery, API Routing, Volumetric Abuse Detection, Sequence Mitigation, JWT Validation, Schema Validation, and more.
 
 ## Cloudflare Workers
 
-Cloudflare Workers can provide details around the Client Certificate, such as returning information via headers to the client or to the origin server. Learn more in the [mTLS with Workers section](placeholder) below.
+Cloudflare Workers can provide details around the Client Certificate, such as returning information via headers to the client or to the origin server. Learn more in the [mTLS with Workers section](/learning-paths/mtls/mtls-workers/) below.
+
+
+:::note
+Snippets do not support any [Bindings](/workers/runtime-apis/bindings/) and does not work with mTLS.

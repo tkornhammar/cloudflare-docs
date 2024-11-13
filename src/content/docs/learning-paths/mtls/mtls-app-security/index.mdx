@@ -1,5 +1,5 @@
 ---
-title: mTLS with API Shield
+title: mTLS with Application Security
 pcx_content_type: overview
 sidebar:
   order: 1
@@ -21,6 +21,14 @@ By default, mTLS uses Client Certificates issued by a Cloudflare Managed CA. Clo
     Example host: [mtls-test.example.com](https://mtls-test.example.com/)
 
 3. Select **Create Certificate** to generate the private key (usually referred to as Private Certificate) and Certificate Signing Request (CSR) with Cloudflare (which includes the Public Certificate), or use your own private key and CSR. Using your own allows you to also [label client certificates](/ssl/client-certificates/label-client-certificate/).
+
+To generate and use your own CSR, you can run a command like the following:
+
+```txt
+openssl req -new -newkey rsa:2048 -nodes -keyout client1.key -out client1.csr -subj '/C=GB/ST=London/L=London/O=Organization/CN=CommonName'
+```
+
+Or use a script like this one from [Github](https://github.com/erfianugrah/rootcatest/blob/main/fullgenerator.py).
 
 ## 2. Install the client certificate
 
