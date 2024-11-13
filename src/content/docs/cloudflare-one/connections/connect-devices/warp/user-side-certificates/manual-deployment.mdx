@@ -437,11 +437,11 @@ To install a certificate for use in a Docker container:
 
 4. Add the certificate to your Docker container:
 
-   <Tabs> <TabItem label="Dockerfile">
+   <Tabs> <TabItem label="During build process">
 
-   To add the certificate during the build process:
+   To add the certificate to your Dockerfile to install it during the build process:
 
-   1. Modify the Dockerfile. For example:
+   1. Add the certificate install directions to your Dockerfile. For example:
 
       ```docker title="Red Hat-based images"
       FROM registry.access.redhat.com/ubi9/ubi:latest
@@ -496,11 +496,11 @@ To install a certificate for use in a Docker container:
 
    </TabItem>
 
-   <TabItem label="Docker Compose">
+   <TabItem label="During runtime">
 
-   To add the certificate during runtime:
+   To add the certificate to your Docker Compose file to install it during runtime:
 
-   1. Add the certificate to your `docker-compose.yml` file. For example:
+   1. Add the certificate install directions to your `docker-compose.yml` file. For example:
 
       ```diff lang="yaml" title="Red Hat-based images"
       version: '3'
