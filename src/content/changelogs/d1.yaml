@@ -5,6 +5,12 @@ productLink: "/d1/"
 productArea: Developer platform
 productAreaLink: /workers/platform/changelog/platform/
 entries:
+  - publish_date: "2024-11-18"
+    title: Support for multiple queries in a single prepared statement
+    description: |-
+      You can now have multiple queries in a single prepared statement when using `db.prepare`. To use this feature, separate each query with a semi-colon. Prepared statements with multiple queries only returns the results of the last query, even though all queries are executed. Additionally, you can only bind parameters to the last query in the prepared statement.
+
+      For more information, refer to [`db.prepare` guidance](/d1/worker-api/prepare-a-statement/#guidance).
   - publish_date: "2024-08-23"
     title: D1 alpha databases have stopped accepting SQL queries
     description: |-
