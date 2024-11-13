@@ -101,23 +101,23 @@ const ProductCatalog = ({
 							href={product.data.product.url}
 							className="self-stretch p-3 border-gray-200 dark:border-gray-700 border-solid border rounded-md block !text-inherit no-underline hover:bg-gray-50 dark:hover:bg-black"
 						>
-							<div className="flex items-center">
+							<div className="flex items-start">
 								{product.icon && (
-									<div className="rounded-full p-2 bg-orange-50 mr-2 text-orange-500 dark:bg-orange-950">
+									<div className="rounded-full p-1 bg-orange-50 mr-2 text-orange-500 dark:bg-orange-950">
 										<svg
 											{...product.icon.attributes}
-											width={28}
-											height={28}
+											width={24}
+											height={24}
 											dangerouslySetInnerHTML={{ __html: product.icon.body }}
 										/>
 									</div>
 								)}
 								{!product.icon && (
-									<div className="flex items-center justify-center leading-none rounded-full p-2 bg-orange-50 dark:bg-orange-950 mr-2 text-[color:var(--orange-accent-200)] text-xl font-bold w-11 h-11">
+									<div className="flex items-center justify-center leading-none rounded-full p-1 bg-orange-50 dark:bg-orange-950 mr-2 text-[color:var(--orange-accent-200)] text-lg font-bold w-8 h-8">
 										{product.data.name.substr(0, 1)}
 									</div>
 								)}
-								<span className="font-semibold text-lg text-ellipsis overflow-hidden whitespace-nowrap">
+								<span className="font-semibold text-md mt-0.5">
 									{product.data.name}
 								</span>
 							</div>
