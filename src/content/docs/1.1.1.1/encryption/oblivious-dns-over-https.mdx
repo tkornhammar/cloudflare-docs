@@ -25,7 +25,7 @@ ODoH improves privacy by separating the contents of an HTTP request (and respons
 
 This means that, as long as the proxy and the target do not collude, no single entity can have access to both the DNS messages and the client IP address at the same time. Also, clients are in complete control of proxy and target selection.
 
-Additionally, clients encrypt their query for the target using Hybrid Public Key Encryption. A target's public key is obtained via DNS, where it is bundled into an HTTPS resource record and protected by DNSSEC.
+Additionally, clients encrypt their query for the target using Hybrid Public Key Encryption (HPKE). A target's public key is obtained via DNS, where it is bundled into an HTTPS resource record and protected by DNSSEC.
 
 ## Cloudflare and third-party products
 
@@ -37,5 +37,5 @@ Finally, open source clients such as [dnscrypt-proxy](https://github.com/DNSCryp
 
 ## Related resources
 
-- [Proving Oblivious HTTP privacy properties](https://blog.cloudflare.com/stronger-than-a-promise-proving-oblivious-http-privacy-properties/) blog post
+- [HPKE: Standardizing public-key encryption](https://blog.cloudflare.com/hybrid-public-key-encryption/) blog post
 - [Privacy Gateway](/privacy-gateway/)
