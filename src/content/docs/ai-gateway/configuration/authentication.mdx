@@ -22,7 +22,7 @@ If Authenticated Gateway is enabled but a request does not include the required 
 3. Include the `cf-aig-authorization` header with your API token in each request for this gateway.
 4. Return to the settings page and toggle on Authenticated Gateway.
 
-## Example request with OpenAI
+## Example requests with OpenAI
 
 ```bash
 curl https://gateway.ai.cloudflare.com/v1/{account_id}/{gateway_id}/openai/chat/completions \
@@ -32,9 +32,32 @@ curl https://gateway.ai.cloudflare.com/v1/{account_id}/{gateway_id}/openai/chat/
   --data '{"model": "gpt-3.5-turbo", "messages": [{"role": "user", "content": "What is Cloudflare?"}]}'
 ```
 
-## Setting Authenticated Gateway using the API
+Using OpenAI sdk:
 
-For API setup, see the [API documentation](/api/operations/aig-config-create-gateway/).
+```javascript
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+	apiKey: process.env.OPENAI_API_KEY,
+	baseURL: "https://gateway.ai.cloudflare.com/v1/account-id/gateway/openai",
+	defaultHeaders: {
+		"cf-aig-token": `Bearer {token}`,
+	},
+});
+```
+
+## Example requests with Vercel sdk
+
+```javascript
+import { createOpenAI } from "@ai-sdk/openai";
+
+const openai = createOpenAI({
+	baseURL: "https://gateway.ai.cloudflare.com/v1/account-id/gateway/openai",
+	headers: {
+		"cf-aig-token": `Bearer {token}`,
+	},
+});
+```
 
 ## Expected behavior
 
