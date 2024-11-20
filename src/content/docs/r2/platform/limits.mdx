@@ -37,4 +37,4 @@ Limits specified in MiB (mebibyte), GiB (gibibyte), or TiB (tebibyte) are storag
 
 ## Caching
 
-Currently Cloudflare's [Tiered Cache](/cache/how-to/tiered-cache/) feature is not compatible with responses from R2. These responses will act as if Tiered Cache is not configured.
+Enable [edge caching of your R2 content](https://developers.cloudflare.com/cache/interaction-cloudflare-products/r2/) by configuration Cache Everything or set more narrow cache rules. Further enhance cache levels by enabling [Tiered Cache](/cache/how-to/tiered-cache/).
