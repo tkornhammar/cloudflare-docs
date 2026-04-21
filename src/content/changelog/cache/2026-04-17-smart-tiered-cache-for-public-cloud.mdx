@@ -12,7 +12,7 @@ Previously, Smart Tiered Cache could not reliably select an optimal upper tier f
 
 ## How it works
 
-Set a cloud region hint (for example, `aws/us-east-1` or `gcp/europe-west1`) for your origin IP or hostname. Smart Tiered Cache uses this hint along with real-time latency data to select a primary upper tier close to your cloud region, plus a fallback in a different location for resilience.
+Set a cloud region hint (for example, `aws:us-east-1` or `gcp:europe-west1`) for your origin IP or hostname. Smart Tiered Cache uses this hint along with real-time latency data to select a primary upper tier close to your cloud region, plus a fallback in a different location for resilience.
 
 - **Supported providers**: AWS, GCP, Azure, and Oracle Cloud.
 - **All plans**: Available on Free, Pro, Business, and Enterprise plans at no additional cost.
